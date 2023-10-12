@@ -1,0 +1,5 @@
+query getUpcomingLaunchesList($limit: Int!, $offset: Int!) {
+  launchesUpcoming(limit: $limit, offset: $offset) {
+    ...LaunchCard
+  }
+}

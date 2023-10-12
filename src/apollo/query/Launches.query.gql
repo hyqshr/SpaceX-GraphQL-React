@@ -1,0 +1,5 @@
+query LaunchesList($limit: Int!, $offset: Int!) {
+  launches(limit: $limit, offset: $offset) {
+    ...LaunchCard
+  }
+}

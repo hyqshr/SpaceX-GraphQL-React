@@ -1,0 +1,14 @@
+query GetLaunchpadsList($limit: Int!, $offset: Int!) {
+  launchpads(limit: $limit, offset: $offset) {
+    attempted_launches
+    details
+    id
+    location {
+      name
+    }
+    name
+    status
+    successful_launches
+    wikipedia
+  }
+}
