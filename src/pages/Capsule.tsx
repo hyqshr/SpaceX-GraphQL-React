@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  LaunchCardFragment,
-} from "apollo/generated/schema";
 import { ChevronDoubleDownIcon, ChevronLeftIcon } from "@heroicons/react/outline";
 import backgroundImage from "assets/image/spacex-bg.jpg";
 import { LoadingSpinner, ScrollToTop, GithubSVG } from "components/util";
@@ -21,11 +18,11 @@ const fields = [
 
 const defaultSelection = ["id", "status","type","reuse_count"]; // Default selected values
 
-const getCapsuleQuery = (selectedFields: string[]): DocumentNode => {
+const getCapsuleQuery = (selectedFields: string[], offset: number): DocumentNode => {
     // construct query string based on the selected fields
     return gql`
         query Capsule {
-          capsules {
+          capsules(limit: ${offset + 9}, offset: ${offset}) {
                 ${selectedFields.join('\n')}
             }
         }
@@ -33,21 +30,43 @@ const getCapsuleQuery = (selectedFields: string[]): DocumentNode => {
 };
 
 const Capsule: React.FC = () => {
-    const [query, setQuery] = useState(getCapsuleQuery(defaultSelection));
     const { control, handleSubmit, setValue } = useForm();
+    const [offset, setOffset] = useState(0);
+    const [query, setQuery] = useState(getCapsuleQuery(defaultSelection, offset));
+    const [search, { loading, error, data, fetchMore }] = useLazyQuery(getCapsuleQuery(defaultSelection, offset));
+    
     useEffect(() => {
         setValue('Field', defaultSelection); // Set default selections
         search()
-        console.log("data!", data)
       }, [setValue]);
+
+    const fetchLaunches = async (value: number) => {
+      await fetchMore({
+        variables: { 
+          limit: offset + 9,
+          offset: offset,
+          },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          console.log("prev", prev)
+          console.log("fetchMoreResult", fetchMoreResult)
+          if (!fetchMoreResult) return prev;
+          return { ...prev, ...fetchMoreResult };
+        },
+      });
+    };
+
+    useEffect(() => {
+      console.log("offset", offset)
+      fetchLaunches(offset);
+    }, [offset]);
 
     const onSubmit = async (selected: any) => {
         console.log(selected);
-        setQuery(getCapsuleQuery(selected.Field));
+        setQuery(getCapsuleQuery(selected.Field, offset));
         await search()
         console.log("data!", data)
     };
-    const [search, { loading, error, data }] = useLazyQuery(query);
+    console.log("data!!!", data)
 
   
   return (
@@ -122,7 +141,30 @@ const Capsule: React.FC = () => {
                 ) : (
                     loading ? <p>loading</p> :
                     <p>No capsules data available.</p>
-            )}
+              )}
+
+{!loading && (
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-3 border border-transparent shadow-sm text-lg leading-4 font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600  focus:ring-4 focus:ring-amber-300 disabled:opacity-80"
+              disabled={loading}
+              onClick={() => setOffset((prev) => prev + 9)}
+            >
+              {loading ? (
+                <>
+                  Loading...
+                  <LoadingSpinner classNames="h-6 w-6 text-gray-100" />
+                </>
+              ) : (
+                <>
+                  View More
+                  <span className="ml-2">
+                    <ChevronDoubleDownIcon className="w-5 h-5 text-white" />
+                  </span>
+                </>
+              )}
+            </button>
+          )}
             </div>
       </section>
       <ScrollToTop />

@@ -10,6 +10,8 @@ const client = new ApolloClient({
           launchesPast: offsetLimitPagination(),
           launches: offsetLimitPagination(),
           launchpads: offsetLimitPagination(),
+          launchesUpcoming: offsetLimitPagination(),
+          capsules: offsetLimitPagination(),
         },
       },
     },

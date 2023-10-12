@@ -12,6 +12,9 @@ import Launches from "pages/Launches";
 import UpcomingLaunches from "pages/UpcomingLaunches";
 import Company from "pages/Company";
 import Capsule from "pages/Capsule";
+import Report from "pages/Report";
+import { Provider } from "react-redux";
+import store from './store/store'; 
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,20 +22,23 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <ApolloProvider client={client}>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/spacex-launches">
-          <Route index element={<Home />} />
-          <Route path="detail/:id" element={<LaunchDetail />} />
-          <Route path="launch-pads" element={<LaunchPads />} />
-          <Route path="launches" element={<Launches />} />
-          <Route path="upcoming-launches" element={<UpcomingLaunches />} />
-          <Route path="company" element={<Company />} />
-          <Route path="capsule" element={<Capsule />} />
-        </Route>
-        <Route path="/spacex-launches/*" element={<Error />} />
-      </Routes>
-    </BrowserRouter>
-    <DarkModeToggle />
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/">
+            <Route index element={<Home />} />
+            <Route path="detail/:id" element={<LaunchDetail />} />
+            <Route path="launch-pads" element={<LaunchPads />} />
+            <Route path="launches" element={<Launches />} />
+            <Route path="upcoming-launches" element={<UpcomingLaunches />} />
+            <Route path="company" element={<Company />} />
+            <Route path="capsule" element={<Capsule />} />
+            <Route path="report" element={<Report />} />
+          </Route>
+          <Route path="/*" element={<Error />} />
+        </Routes>
+      </BrowserRouter>
+      <DarkModeToggle />
+    </Provider>
   </ApolloProvider>
 );

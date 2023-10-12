@@ -27,7 +27,7 @@ const Card = ({
       <div className="p-6 bg-gray-50 dark:bg-[#212324] rounded-bl-2xl rounded-br-2xl md:px-8">
         <Link
           className="text-base font-medium text-amber-500 hover:text-amber-600"
-          to={"/spacex-launches/" + href}
+          to={href}
         >
           More info<span aria-hidden="true"> &rarr;</span>
         </Link>
