@@ -12,7 +12,7 @@ const DetailError = ({ param }: { param: string }) => {
         </p>
         <button className="bg-amber-500 rounded-lg px-4 py-2">
           <Link
-            to="/spacex-launches"
+            to="/"
             className="text-white inline-flex items-center"
           >
             <ChevronLeftIcon className="w-5 h-5" />

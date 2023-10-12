@@ -73,7 +73,7 @@ const LaunchPad: React.FC = () => {
     <div className="bg-gray-200 dark:bg-[#25282a] min-h-screen">
       <div className="relative pb-32 bg-gray-800">
       <Link
-          to="/spacex-launches"
+          to="/"
           className="text-amber-500 font-semibold text-4xl "
         >
           <ChevronLeftIcon className="w-5 h-5" />

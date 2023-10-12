@@ -29,7 +29,7 @@ const LaunchDetail: React.FC = () => {
     <div className="bg-gray-200 dark:bg-[#25282a] min-h-screen">
       <div className="max-w-2xl mx-auto py-24 px-4 grid items-center gap-y-8 gap-x-8 sm:px-6 sm:py-20 lg:max-w-7xl lg:px-8 bg-white dark:bg-[#181a1b] min-h-screen">
         <Link
-          to="/spacex-launches"
+          to="/"
           className="text-amber-500 font-semibold text-xl inline-flex items-center"
         >
           <ChevronLeftIcon className="w-5 h-5" />
