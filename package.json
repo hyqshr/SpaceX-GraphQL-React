@@ -28,12 +28,13 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && yarn sentry:sourcemaps",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "codegen": "graphql-codegen --config codegen.yml",
     "predeploy": "yarn build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org yiqiu-huang --project javascript-react ./build && sentry-cli sourcemaps upload --org yiqiu-huang --project javascript-react ./build"
   },
   "eslintConfig": {
     "extends": [
