@@ -6,6 +6,7 @@ import { DocumentNode, gql, useLazyQuery, useQuery } from "@apollo/client";
 import { Multiselect } from "multiselect-react-dropdown";
 import { Controller, set, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import DynamicCard from "components/DynamicCard";
 
 const fields = [
     "attempted_launches", 
@@ -105,7 +106,7 @@ const LaunchPad: React.FC = () => {
                     control={control}
                     name="Field"
                     render={({ field: { value, onChange } }) => (
-                        <Multiselect
+                      <Multiselect
                         options={fields}
                         isObject={false}
                         showCheckbox={true}
@@ -114,7 +115,7 @@ const LaunchPad: React.FC = () => {
                         onSelect={onChange}
                         onRemove={onChange}
                         selectedValues={value}
-                    />
+                      />
                 )}
                 />
                 <button
@@ -125,46 +126,17 @@ const LaunchPad: React.FC = () => {
                 </button>
             </form>
             {data ? ( 
-              <ul>
+              <ul className="grid grid-cols-1 gap-y-20 lg:grid-cols-3 lg:gap-y-400 lg:gap-x-8">
                 {data.launchpads.map((launchpads: Record<string, any>) => (
-                  <li className="pt-5">
-                    <ul>
-                      {Object.keys(launchpads).map((key: string) => (
-                        <li key={key}>
-                          <strong>{key}:</strong> {launchpads[key]}
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
+                  <div className="">
+                    <DynamicCard title={launchpads.name} otherProps={launchpads}/>
+                  </div>
                 ))}
               </ul>
                 ) : (
                     loading ? <p>loading</p> :
                     <p>No launch pad data available.</p>
               )}
-
-            {!loading && (
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-3 border border-transparent shadow-sm text-lg leading-4 font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600  focus:ring-4 focus:ring-amber-300 disabled:opacity-80"
-              disabled={loading}
-              onClick={() => setOffset((prev) => prev + 9)}
-            >
-              {loading ? (
-                <>
-                  Loading...
-                  <LoadingSpinner classNames="h-6 w-6 text-gray-100" />
-                </>
-              ) : (
-                <>
-                  View More
-                  <span className="ml-2">
-                    <ChevronDoubleDownIcon className="w-5 h-5 text-white" />
-                  </span>
-                </>
-              )}
-            </button>
-          )}
             </div>
       </section>
       <ScrollToTop />

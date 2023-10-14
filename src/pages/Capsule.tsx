@@ -6,6 +6,9 @@ import { DocumentNode, gql, useLazyQuery, useQuery } from "@apollo/client";
 import { Multiselect } from "multiselect-react-dropdown";
 import { Controller, set, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
+import { on } from "events";
+import DynamicCard from "components/DynamicCard";
 
 const fields = [
     "landings", 
@@ -17,6 +20,7 @@ const fields = [
   ];
 
 const defaultSelection = ["id", "status","type","reuse_count"]; // Default selected values
+const sortableFields = ['reuse_count']
 
 const getCapsuleQuery = (selectedFields: string[], offset: number): DocumentNode => {
     // construct query string based on the selected fields
@@ -32,42 +36,64 @@ const getCapsuleQuery = (selectedFields: string[], offset: number): DocumentNode
 const Capsule: React.FC = () => {
     const { control, handleSubmit, setValue } = useForm();
     const [offset, setOffset] = useState(0);
-    const [query, setQuery] = useState(getCapsuleQuery(defaultSelection, offset));
-    const [search, { loading, error, data, fetchMore }] = useLazyQuery(getCapsuleQuery(defaultSelection, offset));
-    
-    useEffect(() => {
-        setValue('Field', defaultSelection); // Set default selections
-        search()
-      }, [setValue]);
+    // const [query, setQuery] = useState(getCapsuleQuery(defaultSelection, offset));
+    const [selected, setSelected] = useState(defaultSelection);
+    const [hasMoreData, setHasMoreData] = useState(true);
+    const [filteredData, setFilteredData] = useState([]); 
 
+    const GET_CAPSULES = gql`
+      query Capsules($offset: Int, $limit: Int) {
+        capsules(offset: $offset, limit: $limit) {
+            ${selected.join('\n')}
+        }  
+      }
+    `;
+    const [loadMore, setLoadMore] = useState(false);
+    const [loadList, { data, loading, error, fetchMore }] =
+    useLazyQuery(GET_CAPSULES, {
+        variables: { 
+          limit: offset + 9,
+          offset: offset,
+        },
+      });
+      console.log("Data!!!", data)
+  
+    useEffect(() => {
+      loadList();
+    }, [loadList]);
+  
     const fetchLaunches = async (value: number) => {
+      setLoadMore(true);
+      console.log("fetch!!!!", value)
       await fetchMore({
         variables: { 
           limit: offset + 9,
           offset: offset,
-          },
+         },
         updateQuery: (prev, { fetchMoreResult }) => {
-          console.log("prev", prev)
-          console.log("fetchMoreResult", fetchMoreResult)
-          if (!fetchMoreResult) return prev;
+        console.log("prev!!!!", prev)
+        console.log("fetchMoreResult!!!!", fetchMoreResult)
+  
+          if (fetchMoreResult.capsules.length === 0) {
+            setHasMoreData(false)
+            return prev
+          };
           return { ...prev, ...fetchMoreResult };
         },
       });
+      setLoadMore(false);
     };
-
+  
     useEffect(() => {
-      console.log("offset", offset)
       fetchLaunches(offset);
+      console.log("fetch!!", offset)
     }, [offset]);
-
-    const onSubmit = async (selected: any) => {
-        console.log(selected);
-        setQuery(getCapsuleQuery(selected.Field, offset));
-        await search()
-        console.log("data!", data)
-    };
-    console.log("data!!!", data)
-
+    
+    const onSubmit = (selected: any) => {
+      setHasMoreData(true)
+      setOffset(0)
+      setSelected(selected.Field)
+    }
   
   return (
     <div className="bg-gray-200 dark:bg-[#25282a] min-h-screen">
@@ -98,6 +124,7 @@ const Capsule: React.FC = () => {
         aria-labelledby="contact-heading"
       >
         <div className="mt-5">
+        <SearchBar data={data?.capsules} setFilteredData={setFilteredData} sortableFields={sortableFields}/>
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex justify-between">
                 <label htmlFor="Field" className="text-gray-700">Select the field you want to see:</label>
@@ -125,25 +152,17 @@ const Capsule: React.FC = () => {
                 </button>
             </form>
             {data ? ( 
-              <ul>
-                {data.capsules.map((capsule: Record<string, any>) => (
-                  <li className="pt-5">
-                    <ul>
-                      {Object.keys(capsule).map((key: string) => (
-                        <li key={key}>
-                          <strong>{key}:</strong> {capsule[key]}
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
+              <ul className="grid grid-cols-1 gap-y-20 lg:grid-cols-3 lg:gap-y-400 lg:gap-x-8">
+                {filteredData?.map((capsule: Record<string, any>) => (
+                  <DynamicCard title={capsule.name} otherProps={capsule}/>
                 ))}
               </ul>
                 ) : (
-                    loading ? <p>loading</p> :
+                    loading ? <LoadingSpinner classNames="h-6 w-6 text-gray-100" /> :
                     <p>No capsules data available.</p>
               )}
 
-{!loading && (
+          {!loading && hasMoreData && (
             <button
               type="button"
               className="inline-flex items-center px-4 py-3 border border-transparent shadow-sm text-lg leading-4 font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600  focus:ring-4 focus:ring-amber-300 disabled:opacity-80"
@@ -165,6 +184,9 @@ const Capsule: React.FC = () => {
               )}
             </button>
           )}
+          {!hasMoreData? (
+            <div>no more!!!</div>
+          ) : <div></div>}
             </div>
       </section>
       <ScrollToTop />

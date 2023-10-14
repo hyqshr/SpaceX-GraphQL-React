@@ -7,11 +7,14 @@ import { ChevronDoubleDownIcon } from "@heroicons/react/outline";
 import backgroundImage from "assets/image/spacex-bg.jpg";
 import { LoadingSpinner, ScrollToTop, GithubSVG } from "components/util";
 import { LaunchCard } from "components";
-import Panel from "components/Panel";
+import SearchBar from "components/SearchBar";
+
+const sortableFields = ['launch_date_utc']
 
 const UpcomingLaunches: React.FC = () => {
   const [offset, setOffset] = useState(0);
   const [loadMore, setLoadMore] = useState(false);
+  const [filteredData, setFilteredData] = useState([]); 
   const [loadList, { data, loading, error, fetchMore }] =
   useGetUpcomingLaunchesListLazyQuery({
       variables: { 
@@ -35,6 +38,7 @@ const UpcomingLaunches: React.FC = () => {
        },
       updateQuery: (prev, { fetchMoreResult }) => {
       console.log("prev!!!!", prev)
+      console.log("fetchMoreResult!!!!", fetchMoreResult)
 
         if (!fetchMoreResult) return prev;
         return { ...prev, ...fetchMoreResult };
@@ -81,12 +85,13 @@ const UpcomingLaunches: React.FC = () => {
 
       {/* Overlapping cards */}
       <section
-        className="-mt-32 max-w-7xl mx-auto relative z-10 pb-32 px-4 sm:px-6 lg:px-8"
+        className="mt-5 max-w-7xl mx-auto relative z-10 pb-32 px-4 sm:px-6 lg:px-8"
         aria-labelledby="contact-heading"
       >
+        <SearchBar data={data?.launchesUpcoming} setFilteredData={setFilteredData} sortableFields={sortableFields}/>
         <div className="grid grid-cols-1 gap-y-20 lg:grid-cols-3 lg:gap-y-400 lg:gap-x-8">
-          {data?.launchesUpcoming?.map((launch, i) => (
-            <LaunchCard {...(launch as LaunchCardFragment)} key={launch?.id} />
+          {filteredData?.map((launch, i) => (
+            <LaunchCard {...(launch as LaunchCardFragment)} />
           ))}
         </div>
 

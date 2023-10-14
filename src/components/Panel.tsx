@@ -1,4 +1,5 @@
 import Card from './Card';
+import { CapsuleSVG, PadsSVG, CompanySVG, RocketSVG, ReportSVG } from './util';
 
 const Panel = () => {
   const data = [
@@ -6,26 +7,42 @@ const Panel = () => {
       title: 'Launch pads',
       subtitle: 'Information about SpaceX launch pads',
       href: 'launch-pads',
+      icon: <PadsSVG />,
     },
     {
       title: 'Launches',
       subtitle: 'Past and future flight data from SpaceX',
       href: 'launches',
+      icon: <RocketSVG />,
+
     },
     {
       title: 'Upcoming launches',
       subtitle: 'Information on upcoming SpaceX flights',
       href: 'upcoming-launches',
+      icon: <RocketSVG />,
+
     },
     {
       title: 'Capsule information',
       subtitle: 'Data about SpaceX capsules',
       href: 'capsule',
+      icon: <CapsuleSVG />,
+
     },
     {
       title: 'Company information',
       subtitle: 'Insights into SpaceX as a company',
       href: 'company',
+      icon: <CompanySVG />,
+
+    },
+    {
+      title: 'Report',
+      subtitle: 'Review suspicious activity',
+      href: 'report',
+      icon: <ReportSVG />,
+
     },
   ];
 
@@ -37,6 +54,7 @@ const Panel = () => {
           title={item.title}
           subtitle={item.subtitle}
           href={item.href}
+          icon={item.icon}
         />
       ))}
     </div>
