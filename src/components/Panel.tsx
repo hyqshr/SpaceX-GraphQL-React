@@ -40,10 +40,22 @@ const Panel = () => {
     {
       title: 'Report',
       subtitle: 'Review suspicious activity',
-      href: 'report',
+      href: 'reports',
       icon: <ReportSVG />,
-
     },
+    {
+      title: 'File report',
+      subtitle: 'Find anything suspicious? File a report!',
+      href: 'submit-report',
+      icon: <ReportSVG />,
+    },
+    {
+      title: 'Sentry Error Test',
+      subtitle: 'Test Sentry Error',
+      href: 'error',
+      icon: <ReportSVG />,
+    },
+    
   ];
 
   return (

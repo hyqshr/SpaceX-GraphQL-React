@@ -29,31 +29,7 @@ const Report: React.FC = () => {
       status: 0,
       ...data }));
   };
-  const handleDelete = (id: number) => {
-    dispatch(deleteReport(id));
-  };
 
-  const handleSetStatus = (id: number) => {
-    dispatch(setStatus({ id, status: 1 }));
-  };
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [filterStatus, setFilterStatus] = useState(false);
-
-  const sortedReports = [...reports].sort((a, b) => {
-    if(a.date < b.date) return sortOrder === 'asc' ? -1 : 1;
-    if(a.date > b.date) return sortOrder === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  const filteredReports = filterStatus ? sortedReports.filter(report => report.status === 0) : sortedReports;
-
-  const handleSort = () => {
-    setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
-  };
-
-  const handleFilter = () => {
-    setFilterStatus(prevFilterStatus => !prevFilterStatus);
-  };
 
   return (
     <div>
@@ -108,23 +84,6 @@ const Report: React.FC = () => {
         <Button label="Submit"/>
       </div>
     </form>
-
-    <div className='flex justify-around mb-4'>
-        <Button onClick={handleSort} label={sortOrder === 'asc' ? "Sort Descending" : "Sort Ascending"} />
-        <Button onClick={handleFilter} label={filterStatus ? "Show All" : "Show Only Status 0"} />
-    </div>
-
-    <div className="grid grid-cols-3 gap-y-20 lg:grid-cols-4 p-5 space-x-5">
-      {filteredReports.map((report) => (
-        <div key={report.id} className="">
-          <ReportCard report={report}/>
-          <div className='flex justify-around'>
-            <Button onClick={() => handleDelete(report.id)} label="Delete" />
-            <Button onClick={() => handleSetStatus(report.id)} label="Set Status" />
-          </div>
-        </div>
-      ))}
-    </div>
     </div>
   );
 };
