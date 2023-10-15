@@ -47,8 +47,6 @@ const LaunchPad: React.FC = () => {
           offset: offset,
           },
         updateQuery: (prev, { fetchMoreResult }) => {
-          console.log("prev", prev)
-          console.log("fetchMoreResult", fetchMoreResult)
           if (!fetchMoreResult) return prev;
           return { ...prev, ...fetchMoreResult };
         },
@@ -56,18 +54,14 @@ const LaunchPad: React.FC = () => {
     };
 
     useEffect(() => {
-      console.log("offset", offset)
       fetchLaunches(offset);
     }, [offset]);
 
     const onSubmit = async (selected: any) => {
-      console.log(selected);
       setQuery(getCapsuleQuery(selected.Field, offset));
       await search()
-      console.log("data!", data)
     };
     const [search, { loading, error, data, fetchMore }] = useLazyQuery(query);
-    console.log("data!!!", data)
 
   
   return (

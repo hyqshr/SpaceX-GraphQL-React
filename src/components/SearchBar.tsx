@@ -61,7 +61,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ data, setFilteredData, sortableFi
   }, [data, searchQuery]);
 
   const filterData = (query: string) => {
-    const filteredItems = data.filter((item: any) => {
+    const filteredItems = data?.filter((item: any) => {
       return Object.values(item).some((value) => {
         if (typeof value === "string") {
           const fieldValue = value.toLowerCase();
