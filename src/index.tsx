@@ -18,7 +18,7 @@ import store from './store/store';
 import * as Sentry from "@sentry/react";
 import ReportPanel from "pages/ReportPanel";
 
-Sentry.init({
+process.env.NODE_ENV === "production" && Sentry.init({
   dsn: "https://f4c7f260c9fea0e71927a249d5966a2f@o4506039707172864.ingest.sentry.io/4506039709270016",
   integrations: [
     new Sentry.BrowserTracing({
