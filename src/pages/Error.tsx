@@ -28,6 +28,7 @@ const Error: React.FC = () => {
           >
             Go back home
           </Link>
+          <button className="inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md text-black text-opacity-75 bg-white bg-opacity-60 hover:bg-opacity-50" onClick={() => methodDoesNotExist()}>Error Button</button>;
         </div>
       </div>
     </>
