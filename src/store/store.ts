@@ -2,7 +2,7 @@ import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import { persistStore, persistReducer } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-import reportReducer, { ReportState } from './reportSlice'; // your reportSlice is being imported here
+import reportReducer, { ReportState } from './reportSlice'; 
 
 const persistConfig = {
   key: 'root',
@@ -11,7 +11,7 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer<ReportState>(persistConfig, reportReducer); // updated this line
-
+// set up redux store with persisted reducer, data should be persisted in local storage
 const store = configureStore({
   reducer: {
     reports: persistedReducer,

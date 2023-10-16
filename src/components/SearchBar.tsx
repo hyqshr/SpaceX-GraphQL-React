@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-// Search bar that can filter the data by any field in the object 
-// + Dropdown to sort the number / date in the object
 
 type SearchBarProps = {
   data: any;
@@ -13,6 +11,9 @@ enum SortBy {
     DESCENDING = "descending",
 }
 
+
+// Search bar that can filter the data by any field in the object 
+// + Dropdown to sort the number / date in the object
 const SearchBar: React.FC<SearchBarProps> = ({ data, setFilteredData, sortableFields }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const handleSortChange = (value: string) => {
