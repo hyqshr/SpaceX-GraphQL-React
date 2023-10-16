@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  LaunchCardFragment,
-} from "apollo/generated/schema";
-import { ChevronDoubleDownIcon } from "@heroicons/react/outline";
 import backgroundImage from "assets/image/spacex-bg.jpg";
-import { LoadingSpinner, ScrollToTop, GithubSVG } from "components/util";
-import { DocumentNode, gql, useLazyQuery, useQuery } from "@apollo/client";
-import { Multiselect } from "multiselect-react-dropdown";
-import { Controller, set, useForm } from "react-hook-form";
+import { ScrollToTop } from "components/util";
+import { DocumentNode, gql, useLazyQuery } from "@apollo/client";
+import { useForm } from "react-hook-form";
+import FieldSelectionBar from "components/FieldSelectionBar";
+import DynamicCard from "components/DynamicCard";
 
 const fields = [
-    "ceo", 
     "coo",
     "cto",
     "cto_propulsion",
@@ -31,6 +27,7 @@ const getCompanyQuery = (selectedFields: string[]): DocumentNode => {
     return gql`
         query Company {
             company {
+                ceo
                 ${selectedFields.join('\n')}
             }
         }
@@ -38,20 +35,18 @@ const getCompanyQuery = (selectedFields: string[]): DocumentNode => {
 };
 
 const Company: React.FC = () => {
-    const [query, setQuery] = useState(getCompanyQuery(defaultSelection));
-    const { control, handleSubmit, setValue } = useForm();
+    const [query, setQuery] = useState<DocumentNode>(getCompanyQuery(defaultSelection));
+    const { setValue } = useForm();
     useEffect(() => {
-        setValue('Field', defaultSelection); // Set default selections
-        search()
-      }, [setValue]);
+      setValue('Field', defaultSelection); // Set default selections
+      LoadMore()
+    }, [setValue]);
 
-    const onSubmit = async (selected: any) => {
-        console.log(selected);
-        setQuery(getCompanyQuery(selected.Field));
-        await search()
-        console.log("data!", data)
+    const onSubmit = async (selected: SelectedType) => {
+      setQuery(getCompanyQuery(selected.Field));
+      await LoadMore()
     };
-    const [search, { loading, error, data }] = useLazyQuery(query);
+    const [LoadMore, { loading, error, data }] = useLazyQuery(query);
 
   
   return (
@@ -61,7 +56,7 @@ const Company: React.FC = () => {
           <img
             className="w-full h-full object-cover"
             src={backgroundImage}
-            alt=""
+            alt="rocket"
           />
         </div>
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
@@ -76,43 +71,15 @@ const Company: React.FC = () => {
         aria-labelledby="contact-heading"
       >
         <div className="mt-5">
-
-            <form onSubmit={handleSubmit(onSubmit)} className="flex justify-between">
-                <label htmlFor="Field" className="text-gray-700">Select the field you want to see:</label>
-                <Controller
-                    control={control}
-                    name="Field"
-                    render={({ field: { value, onChange } }) => (
-                        <Multiselect
-                        options={fields}
-                        isObject={false}
-                        showCheckbox={true}
-                        hidePlaceholder={true}
-                        closeOnSelect={false}
-                        onSelect={onChange}
-                        onRemove={onChange}
-                        selectedValues={value}
-                    />
-                )}
-                />
-                <button
-                    type="submit"
-                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-300"
-                >
-                    Search
-                </button>
-            </form>
+            {/* Display Data and Field Selector */}
+            <FieldSelectionBar onSubmit={onSubmit} fields={fields} />
             {data ? ( 
                 <ul className="grid grid-cols-3 gap-4 mt-5">
                 {Object.keys(data.company).map((field, index) => {
                     // Filter out the __typename field
                     if (field !== '__typename') {
                     return (
-                        <li key={index} className="text-3xl">
-                        <div className="bg-gray-200 p-2 rounded">
-                            <strong>{field}:</strong> {data.company[field]}
-                        </div>
-                        </li>
+                              <DynamicCard title={field + ": " + data.company[field]} key={index}/>
                     );
                     }
                     return null; // Exclude the field
@@ -122,7 +89,7 @@ const Company: React.FC = () => {
                     loading ? <p>loading</p> :
                     <p>No company data available.</p>
             )}
-            </div>
+        </div>
       </section>
       <ScrollToTop />
     </div>
