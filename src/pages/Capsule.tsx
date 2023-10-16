@@ -56,7 +56,6 @@ const Capsule: React.FC = () => {
           offset: offset,
         },
       });
-      console.log("Data!!!", data)
   
     useEffect(() => {
       loadList();
@@ -64,14 +63,12 @@ const Capsule: React.FC = () => {
   
     const fetchLaunches = async (value: number) => {
       setLoadMore(true);
-      console.log("fetch!!!!", value)
       await fetchMore({
         variables: { 
           limit: offset + 9,
           offset: offset,
          },
         updateQuery: (prev, { fetchMoreResult }) => {
-        console.log("prev!!!!", prev)
         console.log("fetchMoreResult!!!!", fetchMoreResult)
   
           if (fetchMoreResult.capsules.length === 0) {

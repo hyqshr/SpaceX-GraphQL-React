@@ -38,7 +38,7 @@ const LaunchPad: React.FC = () => {
     const fetchLaunches = async (offset: number) => {
       await fetchMore({
         variables: { 
-          limit: offset + 9,
+          limit: offset + PAGE_NUM,
           offset: offset,
           },
         updateQuery: (prev, { fetchMoreResult }) => {
