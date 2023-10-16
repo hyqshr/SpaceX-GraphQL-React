@@ -11,7 +11,7 @@ const Home: React.FC = () => {
           <img
             className="w-full h-full object-cover"
             src={backgroundImage}
-            alt=""
+            alt="Rocket Launch"
           />
         </div>
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">

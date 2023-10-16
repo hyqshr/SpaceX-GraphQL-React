@@ -53,7 +53,6 @@ const LaunchPad: React.FC = () => {
     }, [offset]);
 
     const onSubmit = async (selected: SelectedType) => {
-      console.log(selected)
       setQuery(getLaunchpadsQuery(selected.Field, offset));
       await search()
     };

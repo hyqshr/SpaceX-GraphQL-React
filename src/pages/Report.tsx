@@ -22,7 +22,6 @@ const Report: React.FC = () => {
   const dispatch = useDispatch();
 
   const onSubmit = (data: IFormInput) => {
-    console.log("data!", data)
     dispatch(addReport({ 
       id: reports.length + 1, 
       date: Date.now(), 

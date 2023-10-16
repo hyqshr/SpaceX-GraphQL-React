@@ -7,3 +7,5 @@ export { default as RocketSVG } from "./RocketSVG";
 export { default as PadsSVG } from "./PadsSVG";
 export { default as CompanySVG } from "./CompanySVG";
 export { default as ReportSVG } from "./ReportSVG";
+export { default as ErrorSVG } from "./ErrorSVG";
+export { default as FileSVG } from "./FileSVG";

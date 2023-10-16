@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+// Search bar that can filter the data by any field in the object 
+// + Dropdown to sort the number / date in the object
 
 type SearchBarProps = {
   data: any;
@@ -12,19 +14,16 @@ enum SortBy {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ data, setFilteredData, sortableFields }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortBy | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const handleSortChange = (value: string) => {
-    console.log("value!!", value)
     const selectedSortBy = value.split(":")[0] as SortBy;
     const field = value.split(":")[1];
-    setSortBy(selectedSortBy);
     sortData(selectedSortBy, field);
   };
 
   const sortData = (selectedSortBy: SortBy | null, field: string) => {
-    // Sort number and date field by ASCENDING or DESCENDING
     if (!sortableFields) return;
+    // Sort number and date field by ASCENDING
     if (selectedSortBy === SortBy.ASCENDING) {
       setFilteredData([...data].sort((a, b) => {
         if (typeof a[field] === "number" && typeof b[field] === "number") {
@@ -34,6 +33,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ data, setFilteredData, sortableFi
         }
         return 0;
       }));
+    // Sort number and date field by DESCENDING
     } else if (selectedSortBy === SortBy.DESCENDING) {
       setFilteredData([...data].sort((a, b) => {
         if (typeof a[field] === "number" && typeof b[field] === "number") {
@@ -62,6 +62,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ data, setFilteredData, sortableFi
 
   const filterData = (query: string) => {
     const filteredItems = data?.filter((item: any) => {
+      // filter by any field in the object
       return Object.values(item).some((value) => {
         if (typeof value === "string") {
           const fieldValue = value.toLowerCase();
