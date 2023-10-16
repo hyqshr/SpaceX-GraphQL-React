@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ChevronDoubleDownIcon, ChevronLeftIcon } from "@heroicons/react/outline";
+import { ChevronDoubleDownIcon } from "@heroicons/react/outline";
 import backgroundImage from "assets/image/spacex-bg.jpg";
-import { LoadingSpinner, ScrollToTop, GithubSVG } from "components/util";
-import { DocumentNode, gql, useLazyQuery, useQuery } from "@apollo/client";
-import { Multiselect } from "multiselect-react-dropdown";
-import { Controller, set, useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { LoadingSpinner, ScrollToTop } from "components/util";
+import { gql, useLazyQuery } from "@apollo/client";
 import SearchBar from "../components/SearchBar";
-import { on } from "events";
 import DynamicCard from "components/DynamicCard";
+import FieldSelectionBar from "components/FieldSelectionBar";
+import { Capsule } from "apollo/generated/schema";
 
 const fields = [
     "landings", 
@@ -21,25 +19,13 @@ const fields = [
 
 const defaultSelection = ["id", "status","type","reuse_count"]; // Default selected values
 const sortableFields = ['reuse_count']
+const PAGE_NUM = 9;
 
-const getCapsuleQuery = (selectedFields: string[], offset: number): DocumentNode => {
-    // construct query string based on the selected fields
-    return gql`
-        query Capsule {
-          capsules(limit: ${offset + 9}, offset: ${offset}) {
-                ${selectedFields.join('\n')}
-            }
-        }
-    `;
-};
-
-const Capsule: React.FC = () => {
-    const { control, handleSubmit, setValue } = useForm();
-    const [offset, setOffset] = useState(0);
-    // const [query, setQuery] = useState(getCapsuleQuery(defaultSelection, offset));
-    const [selected, setSelected] = useState(defaultSelection);
-    const [hasMoreData, setHasMoreData] = useState(true);
-    const [filteredData, setFilteredData] = useState([]); 
+const CapsulePage: React.FC = () => {
+    const [offset, setOffset] = useState<number>(0);
+    const [selected, setSelected] = useState<string[]>(defaultSelection);
+    const [hasMoreData, setHasMoreData] = useState<boolean>(true);
+    const [filteredData, setFilteredData] = useState<Capsule[]>([]); 
 
     const GET_CAPSULES = gql`
       query Capsules($offset: Int, $limit: Int) {
@@ -48,45 +34,35 @@ const Capsule: React.FC = () => {
         }  
       }
     `;
-    const [loadMore, setLoadMore] = useState(false);
     const [loadList, { data, loading, error, fetchMore }] =
     useLazyQuery(GET_CAPSULES, {
         variables: { 
-          limit: offset + 9,
+          limit: offset + PAGE_NUM,
           offset: offset,
         },
       });
   
-    useEffect(() => {
-      loadList();
-    }, [loadList]);
-  
-    const fetchLaunches = async (value: number) => {
-      setLoadMore(true);
+    const fetchLaunches = async (offset: number) => {
       await fetchMore({
         variables: { 
-          limit: offset + 9,
+          limit: offset + PAGE_NUM,
           offset: offset,
          },
         updateQuery: (prev, { fetchMoreResult }) => {
-        console.log("fetchMoreResult!!!!", fetchMoreResult)
-  
           if (fetchMoreResult.capsules.length === 0) {
             setHasMoreData(false)
             return prev
           };
-          return { ...prev, ...fetchMoreResult };
+        return { ...prev, ...fetchMoreResult };
         },
       });
-      setLoadMore(false);
     };
   
     useEffect(() => {
       fetchLaunches(offset);
-      console.log("fetch!!", offset)
     }, [offset]);
     
-    const onSubmit = (selected: any) => {
+    const onSubmit = (selected: SelectedType) => {
       setHasMoreData(true)
       setOffset(0)
       setSelected(selected.Field)
@@ -95,18 +71,11 @@ const Capsule: React.FC = () => {
   return (
     <div className="bg-gray-200 dark:bg-[#25282a] min-h-screen">
       <div className="relative pb-32 bg-gray-800">
-      <Link
-          to="/"
-          className="text-amber-500 font-semibold text-4xl "
-        >
-          <ChevronLeftIcon className="w-5 h-5" />
-          GO BACK
-        </Link>
         <div className="absolute inset-0">
           <img
             className="w-full h-full object-cover"
             src={backgroundImage}
-            alt=""
+            alt="rocket"
           />
         </div>
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
@@ -121,50 +90,34 @@ const Capsule: React.FC = () => {
         aria-labelledby="contact-heading"
       >
         <div className="mt-5">
-        <SearchBar data={data?.capsules} setFilteredData={setFilteredData} sortableFields={sortableFields}/>
+          {/* SearchBar and FieldSelection Bar */}
+          <SearchBar data={data?.capsules} setFilteredData={setFilteredData} sortableFields={sortableFields}/>
+          <FieldSelectionBar onSubmit={onSubmit} fields={fields} />
 
-            <form onSubmit={handleSubmit(onSubmit)} className="flex justify-between">
-                <label htmlFor="Field" className="text-gray-700">Select the field you want to see:</label>
-                <Controller
-                    control={control}
-                    name="Field"
-                    render={({ field: { value, onChange } }) => (
-                        <Multiselect
-                        options={fields}
-                        isObject={false}
-                        showCheckbox={true}
-                        hidePlaceholder={true}
-                        closeOnSelect={false}
-                        onSelect={onChange}
-                        onRemove={onChange}
-                        selectedValues={value}
-                    />
-                )}
-                />
-                <button
-                    type="submit"
-                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-300"
-                >
-                    Search
-                </button>
-            </form>
-            {data ? ( 
-              <ul className="grid grid-cols-1 gap-y-20 lg:grid-cols-3 lg:gap-y-400 lg:gap-x-8">
-                {filteredData?.map((capsule: Record<string, any>) => (
-                  <DynamicCard title={capsule.name} otherProps={capsule}/>
-                ))}
-              </ul>
-                ) : (
-                    loading ? <LoadingSpinner classNames="h-6 w-6 text-gray-100" /> :
-                    <p>No capsules data available.</p>
-              )}
+          {error && (
+            <p className="text-xl text-gray-800">
+              Uh oh... Something went wrong.
+            </p>
+          )}
+          {/* Display data */}
+          {data ? ( 
+            <ul className="grid grid-cols-1 gap-y-20 lg:grid-cols-3 lg:gap-y-400 lg:gap-x-8">
+              {filteredData?.map((capsule: Record<string, any>) => (
+                <DynamicCard title={capsule.name} otherProps={capsule}/>
+              ))}
+            </ul>
+              ) : (
+                  loading ? <LoadingSpinner classNames="h-6 w-6 text-gray-100" /> :
+                  <p>No capsules data available.</p>
+          )}
 
+          {/* Load more button */}
           {!loading && hasMoreData && (
             <button
               type="button"
               className="inline-flex items-center px-4 py-3 border border-transparent shadow-sm text-lg leading-4 font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600  focus:ring-4 focus:ring-amber-300 disabled:opacity-80"
               disabled={loading}
-              onClick={() => setOffset((prev) => prev + 9)}
+              onClick={() => setOffset((prev) => prev + PAGE_NUM)}
             >
               {loading ? (
                 <>
@@ -181,13 +134,10 @@ const Capsule: React.FC = () => {
               )}
             </button>
           )}
-          {!hasMoreData? (
-            <div>no more!!!</div>
-          ) : <div></div>}
-            </div>
+        </div>
       </section>
       <ScrollToTop />
     </div>
   );
 };
-export default Capsule;
+export default CapsulePage;

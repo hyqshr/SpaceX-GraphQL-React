@@ -11,7 +11,7 @@ import LaunchPads from "pages/LaunchPads";
 import Launches from "pages/Launches";
 import UpcomingLaunches from "pages/UpcomingLaunches";
 import Company from "pages/Company";
-import Capsule from "pages/Capsule";
+import CapsulePage from "pages/Capsule";
 import Report from "pages/Report";
 import { Provider } from "react-redux";
 import store from './store/store'; 
@@ -51,7 +51,7 @@ root.render(
             <Route path="launches" element={<Launches />} />
             <Route path="upcoming-launches" element={<UpcomingLaunches />} />
             <Route path="company" element={<Company />} />
-            <Route path="capsule" element={<Capsule />} />
+            <Route path="capsule" element={<CapsulePage />} />
             <Route path="submit-report" element={<Report />} />
             <Route path="reports" element={<ReportPanel />} />
           </Route>
