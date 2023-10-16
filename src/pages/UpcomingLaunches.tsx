@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Launch,
   LaunchCardFragment,
   useGetUpcomingLaunchesListLazyQuery
 } from "apollo/generated/schema";
@@ -10,37 +11,33 @@ import { LaunchCard } from "components";
 import SearchBar from "components/SearchBar";
 
 const sortableFields = ['launch_date_utc']
+const PAGE_NUM = 9;
 
 const UpcomingLaunches: React.FC = () => {
-  const [offset, setOffset] = useState(0);
-  const [loadMore, setLoadMore] = useState(false);
-  const [filteredData, setFilteredData] = useState([]); 
+  const [offset, setOffset] = useState<number>(0);
+  const [loadMore, setLoadMore] = useState<boolean>(false);
+  const [filteredData, setFilteredData] = useState<Launch[]>([]); 
+  const [hasMoreData, setHasMoreData] = useState<boolean>(true);
   const [loadList, { data, loading, error, fetchMore }] =
   useGetUpcomingLaunchesListLazyQuery({
       variables: { 
-        limit: offset + 9,
+        limit: offset + PAGE_NUM,
         offset: offset,
       },
     });
-    console.log("Data!!!", data)
 
-  useEffect(() => {
-    loadList();
-  }, [loadList]);
-
-  const fetchLaunches = async (value: number) => {
+  const fetchLaunches = async (offset: number) => {
     setLoadMore(true);
-    console.log("fetch!!!!", value)
     await fetchMore({
       variables: { 
-        limit: offset + 9,
+        limit: offset + PAGE_NUM,
         offset: offset,
        },
       updateQuery: (prev, { fetchMoreResult }) => {
-      console.log("prev!!!!", prev)
-      console.log("fetchMoreResult!!!!", fetchMoreResult)
-
         if (!fetchMoreResult) return prev;
+        if (fetchMoreResult?.launchesUpcoming?.length === 0) {
+          setHasMoreData(false);
+        }
         return { ...prev, ...fetchMoreResult };
       },
     });
@@ -49,7 +46,6 @@ const UpcomingLaunches: React.FC = () => {
 
   useEffect(() => {
     fetchLaunches(offset);
-    console.log("fetch!!", offset)
   }, [offset]);
 
   return (
@@ -83,7 +79,7 @@ const UpcomingLaunches: React.FC = () => {
         </div>
       </div>
 
-      {/* Overlapping cards */}
+      {/* SearchBar and Cards */}
       <section
         className="mt-5 max-w-7xl mx-auto relative z-10 pb-32 px-4 sm:px-6 lg:px-8"
         aria-labelledby="contact-heading"
@@ -101,12 +97,12 @@ const UpcomingLaunches: React.FC = () => {
               Uh oh... Something went wrong.
             </p>
           )}
-          {!loading && (
+          {!loading && hasMoreData && (
             <button
               type="button"
               className="inline-flex items-center px-4 py-3 border border-transparent shadow-sm text-lg leading-4 font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600  focus:ring-4 focus:ring-amber-300 disabled:opacity-80"
               disabled={loadMore}
-              onClick={() => setOffset((prev) => prev + 9)}
+              onClick={() => setOffset((prev) => prev + PAGE_NUM)}
             >
               {loadMore ? (
                 <>
