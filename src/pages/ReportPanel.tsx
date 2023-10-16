@@ -41,7 +41,7 @@ const ReportPanel: React.FC = () => {
       {/* Filter Button */}
       <div className='flex justify-around m-9'>
         <Button onClick={handleSort} label={sortOrder === 'asc' ? "Sort Descending" : "Sort Ascending"} />
-        <Button onClick={handleFilter} label={filterStatus ? "Show All" : "Show Only Status Reviewed"} />
+        <Button onClick={handleFilter} label={filterStatus ? "Show All" : "Show Reviewed Only"} />
       </div>
       {/* Display Report */}
       {filteredReports.length > 0 ? (
